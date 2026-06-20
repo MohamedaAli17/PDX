@@ -59,22 +59,21 @@ class _MapScreenState extends State<MapScreen> {
     // Mobile/desktop native WebViews require explicit JS mode; web does not.
     if (!kIsWeb) {
       await controller.setJavaScriptMode(JavaScriptMode.unrestricted);
+      await controller.setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (_) {
+            if (mounted) {
+              setState(() => _isMapLoading = false);
+            }
+          },
+          onWebResourceError: (_) {
+            if (mounted) {
+              setState(() => _isMapLoading = false);
+            }
+          },
+        ),
+      );
     }
-
-    await controller.setNavigationDelegate(
-      NavigationDelegate(
-        onPageFinished: (_) {
-          if (mounted) {
-            setState(() => _isMapLoading = false);
-          }
-        },
-        onWebResourceError: (_) {
-          if (mounted) {
-            setState(() => _isMapLoading = false);
-          }
-        },
-      ),
-    );
 
     await controller.loadRequest(Uri.parse(_pdxMapUrl));
 
